@@ -74,7 +74,9 @@ class PendingDeletionsRepairFlow(RepairsFlow):
         """Ask for confirmation and apply the deletions when given."""
         coordinator = self.entry.runtime_data
         if user_input is not None:
-            await coordinator.async_start_sync(ARG_ASSUME_YES)
+            await coordinator.async_start_sync(
+                ARG_ASSUME_YES, requested_by="the repair notification"
+            )
             return self.async_create_entry(data={})
 
         return self.async_show_form(

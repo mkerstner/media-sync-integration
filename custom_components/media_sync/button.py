@@ -62,4 +62,8 @@ class MediaSyncButton(MediaSyncEntity, ButtonEntity):
     @override
     async def async_press(self) -> None:
         """Press the button."""
-        await self.coordinator.async_start_sync(*self.entity_description.args)
+        # The entity platform sets the calling context before this runs, which
+        # is what lets the activity log name who pressed the button.
+        await self.coordinator.async_start_sync(
+            *self.entity_description.args, context=self._context
+        )

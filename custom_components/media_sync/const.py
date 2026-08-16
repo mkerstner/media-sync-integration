@@ -17,9 +17,10 @@ ADDON_SLUG_SUFFIX: Final = "media_sync"
 
 CONF_ADDON_SLUG: Final = "addon_slug"
 
-# Written by the app, read from here; both are relative to the config folder.
+# Shared with the app through the config folder; all relative to it.
 STATE_PATH: Final = "media_sync/state.json"
 REQUEST_PATH: Final = "media_sync/request.json"
+LOG_PATH: Final = "media_sync/media-sync.log"
 
 UPDATE_INTERVAL_IDLE: Final = timedelta(minutes=5)
 UPDATE_INTERVAL_RUNNING: Final = timedelta(seconds=15)

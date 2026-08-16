@@ -80,17 +80,17 @@ def async_setup_services(hass: HomeAssistant) -> None:
         args = list(DIRECTION_ARGS[call.data[ATTR_DIRECTION]])
         if call.data[ATTR_DRY_RUN]:
             args.append(ARG_DRY_RUN)
-        await entry.runtime_data.async_start_sync(*args)
+        await entry.runtime_data.async_start_sync(*args, context=call.context)
 
     async def async_scan_deletions(call: ServiceCall) -> None:
         """Look for deletion candidates without transferring anything."""
         entry = _async_get_entry(hass, call)
-        await entry.runtime_data.async_start_sync(ARG_SCAN_ONLY)
+        await entry.runtime_data.async_start_sync(ARG_SCAN_ONLY, context=call.context)
 
     async def async_confirm_deletions(call: ServiceCall) -> None:
         """Apply the deletions the last run refused to make."""
         entry = _async_get_entry(hass, call)
-        await entry.runtime_data.async_start_sync(ARG_ASSUME_YES)
+        await entry.runtime_data.async_start_sync(ARG_ASSUME_YES, context=call.context)
 
     async def async_get_pending_deletions(call: ServiceCall) -> ServiceResponse:
         """Return the paths a confirmed deletion would remove."""

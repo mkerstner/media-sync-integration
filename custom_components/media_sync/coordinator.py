@@ -5,7 +5,7 @@ from typing import override
 
 from homeassistant.components.hassio import AddonError, AddonManager, AddonState
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import Context, HomeAssistant
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
@@ -22,6 +22,7 @@ from .const import (
     UPDATE_INTERVAL_IDLE,
     UPDATE_INTERVAL_RUNNING,
 )
+from .log import async_log, async_log_run_requested
 from .repairs import async_manage_pending_deletions_issue
 
 type MediaSyncConfigEntry = ConfigEntry[MediaSyncCoordinator]
@@ -85,16 +86,26 @@ class MediaSyncCoordinator(DataUpdateCoordinator[SyncState]):
         async_manage_pending_deletions_issue(self.hass, self.config_entry, state)
         return state
 
-    async def async_start_sync(self, *args: str) -> None:
+    async def async_start_sync(
+        self,
+        *args: str,
+        context: Context | None = None,
+        requested_by: str | None = None,
+    ) -> None:
         """Queue the arguments for the next run and start the app."""
         if self.data.running:
             raise ServiceValidationError(
                 translation_domain=DOMAIN, translation_key="already_running"
             )
 
+        await async_log_run_requested(
+            self.hass, args, context=context, requested_by=requested_by
+        )
+
         try:
             await self.client.async_write_request(args)
         except MediaSyncError as err:
+            await async_log(self.hass, "action", f"could not be queued: {err}")
             raise HomeAssistantError(
                 translation_domain=DOMAIN,
                 translation_key="request_failed",
@@ -104,6 +115,7 @@ class MediaSyncCoordinator(DataUpdateCoordinator[SyncState]):
         try:
             await self.addon_manager.async_start_addon()
         except AddonError as err:
+            await async_log(self.hass, "action", f"app would not start: {err}")
             raise HomeAssistantError(
                 translation_domain=DOMAIN,
                 translation_key="start_failed",
