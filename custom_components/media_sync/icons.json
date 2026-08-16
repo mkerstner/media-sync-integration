@@ -1,0 +1,43 @@
+{
+  "entity": {
+    "button": {
+      "dry_run": {
+        "default": "mdi:file-find-outline"
+      },
+      "scan_deletions": {
+        "default": "mdi:delete-alert-outline"
+      },
+      "sync_now": {
+        "default": "mdi:sync"
+      }
+    },
+    "sensor": {
+      "last_run": {
+        "default": "mdi:clock-outline"
+      },
+      "last_successful_sync": {
+        "default": "mdi:clock-check-outline"
+      },
+      "pending_deletions": {
+        "default": "mdi:trash-can-outline"
+      },
+      "status": {
+        "default": "mdi:sync-circle"
+      }
+    }
+  },
+  "services": {
+    "confirm_deletions": {
+      "service": "mdi:delete-forever"
+    },
+    "get_pending_deletions": {
+      "service": "mdi:format-list-bulleted"
+    },
+    "scan_deletions": {
+      "service": "mdi:delete-alert-outline"
+    },
+    "sync": {
+      "service": "mdi:sync"
+    }
+  }
+}

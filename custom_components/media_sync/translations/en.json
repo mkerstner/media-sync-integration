@@ -1,0 +1,155 @@
+{
+  "config": {
+    "abort": {
+      "addon_info_failed": "Could not ask the Supervisor about the Media Sync app.",
+      "addon_install_failed": "Could not install the Media Sync app. Its log will say why.",
+      "addon_not_installed": "The Media Sync app is not installed. Install it from Settings > Apps, set its options, then add this integration.",
+      "repository_not_added": "The Media Sync app was not found in your app store. Go to Settings > Apps > ⋮ > Repositories, add https://github.com/mkerstner/media-sync, then try again.",
+      "single_instance_allowed": "Already configured. Only a single configuration is possible."
+    },
+    "progress": {
+      "install_addon": "Please wait while the Media Sync app is installed. This can take a few minutes."
+    },
+    "step": {
+      "configure_app": {
+        "description": "The Media Sync app is installed, but it does not know where to sync yet.\n\nOpen **Settings > Apps > Media Sync** and fill in its settings: which server to reach, and which folders to keep in sync. Starting the app once will also create the SSH key you need to give that server.\n\nYou can finish here now and set that up afterwards.",
+        "title": "Set up the app"
+      },
+      "confirm": {
+        "description": "This adds buttons and status for the Media Sync app, and asks you before anything is deleted.\n\nYou can start a sync from a dashboard button, from an automation using the Media Sync actions, or by running the script yourself in a terminal. However you start it, the result shows up here.\n\nTransfers run over an encrypted SSH connection, using a key the app creates for itself, so there is no password to store. What gets synced is set up in the app's own settings.",
+        "title": "Set up Media Sync"
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "dry_run": {
+        "name": "Dry run"
+      },
+      "scan_deletions": {
+        "name": "Scan for deletions"
+      },
+      "sync_now": {
+        "name": "Sync now"
+      }
+    },
+    "sensor": {
+      "last_run": {
+        "name": "Last run"
+      },
+      "last_successful_sync": {
+        "name": "Last successful sync"
+      },
+      "pending_deletions": {
+        "name": "Pending deletions"
+      },
+      "status": {
+        "name": "Status",
+        "state": {
+          "failed": "Failed",
+          "idle": "Idle",
+          "ok": "Completed",
+          "running": "Running"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "addon_info_failed": {
+      "message": "Could not ask the Supervisor about the Media Sync app: {error}"
+    },
+    "addon_not_installed": {
+      "message": "The Media Sync app is not installed."
+    },
+    "already_running": {
+      "message": "A sync is already running. Wait for it to finish before starting another one."
+    },
+    "entry_not_found": {
+      "message": "No Media Sync configuration found for {target}."
+    },
+    "entry_not_loaded": {
+      "message": "{target} is not loaded."
+    },
+    "request_failed": {
+      "message": "Could not queue the run: {error}"
+    },
+    "start_failed": {
+      "message": "Could not start the Media Sync app: {error}"
+    },
+    "state_read_error": {
+      "message": "Could not read the sync state: {error}"
+    }
+  },
+  "issues": {
+    "pending_deletions": {
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "description": "The last sync found {count} item(s) that are on one side but not the other, and left them alone.\n\n{deletions}\n\nSomething can be missing because it was deleted there, or because it was just added here — there is no way to tell the two apart. If you confirm, the sync runs again and removes these items for good. The list is checked again at that moment, so anything that changed in the meantime is taken into account.",
+            "title": "Confirm these deletions"
+          }
+        }
+      },
+      "title": "Media Sync wants to delete {count} item(s)"
+    }
+  },
+  "selector": {
+    "direction": {
+      "options": {
+        "both": "Both directions",
+        "pull": "Remote server to Home Assistant",
+        "push": "Home Assistant to remote server"
+      }
+    }
+  },
+  "services": {
+    "confirm_deletions": {
+      "description": "Runs the sync with deletions enabled, permanently removing the items reported as pending. Only administrators can call this action.",
+      "fields": {
+        "config_entry": {
+          "description": "The Media Sync configuration to act on.",
+          "name": "Configuration"
+        }
+      },
+      "name": "Confirm deletions"
+    },
+    "get_pending_deletions": {
+      "description": "Returns the paths that a confirmed deletion would remove.",
+      "fields": {
+        "config_entry": {
+          "description": "The Media Sync configuration to act on.",
+          "name": "Configuration"
+        }
+      },
+      "name": "Get pending deletions"
+    },
+    "scan_deletions": {
+      "description": "Looks for items that exist on only one side, without transferring or deleting anything.",
+      "fields": {
+        "config_entry": {
+          "description": "The Media Sync configuration to act on.",
+          "name": "Configuration"
+        }
+      },
+      "name": "Scan for deletions"
+    },
+    "sync": {
+      "description": "Starts a sync run. Deletions are never applied by this action; they are reported for confirmation instead.",
+      "fields": {
+        "config_entry": {
+          "description": "The Media Sync configuration to act on.",
+          "name": "Configuration"
+        },
+        "direction": {
+          "description": "Which way to synchronize. Both directions merges the two sides, keeping whichever copy of a file is newer.",
+          "name": "Direction"
+        },
+        "dry_run": {
+          "description": "Report what would be transferred without writing anything.",
+          "name": "Dry run"
+        }
+      },
+      "name": "Sync"
+    }
+  }
+}

@@ -1,0 +1,44 @@
+sync:
+  fields:
+    config_entry:
+      required: true
+      selector:
+        config_entry:
+          integration: media_sync
+    direction:
+      default: both
+      selector:
+        select:
+          translation_key: direction
+          options:
+            - both
+            - pull
+            - push
+    dry_run:
+      default: false
+      selector:
+        boolean:
+
+scan_deletions:
+  fields:
+    config_entry:
+      required: true
+      selector:
+        config_entry:
+          integration: media_sync
+
+confirm_deletions:
+  fields:
+    config_entry:
+      required: true
+      selector:
+        config_entry:
+          integration: media_sync
+
+get_pending_deletions:
+  fields:
+    config_entry:
+      required: true
+      selector:
+        config_entry:
+          integration: media_sync
