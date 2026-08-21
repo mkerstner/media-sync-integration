@@ -16,7 +16,7 @@
         "title": "Set up the app"
       },
       "confirm": {
-        "description": "This adds buttons and status for the Media Sync app, and asks you before anything is deleted.\n\nYou can start a sync from a dashboard button, from an automation using the Media Sync actions, or by running the script yourself in a terminal. However you start it, the result shows up here.\n\nTransfers run over an encrypted SSH connection, using a key the app creates for itself, so there is no password to store. What gets synced is set up in the app's own settings.",
+        "description": "This adds buttons and status for the Media Sync app, and asks you before anything is deleted while the app's deletion protection is on.\n\nYou can start a sync from a dashboard button, from an automation using the Media Sync actions, or by running the script yourself in a terminal. However you start it, the result shows up here.\n\nTransfers run over an encrypted SSH connection, using a key the app creates for itself, so there is no password to store. What gets synced is set up in the app's own settings.",
         "title": "Set up Media Sync"
       }
     }
@@ -134,7 +134,7 @@
       "name": "Scan for deletions"
     },
     "sync": {
-      "description": "Starts a sync run. Deletions are never applied by this action; they are reported for confirmation instead.",
+      "description": "Starts a sync run. While the app's deletion protection is on, which is the default, deletions are reported for you to confirm rather than applied.",
       "fields": {
         "config_entry": {
           "description": "[%key:component::media_sync::services::confirm_deletions::fields::config_entry::description%]",
