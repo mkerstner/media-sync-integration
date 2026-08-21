@@ -1,4 +1,20 @@
-# Media Sync — Home Assistant integration
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/mkerstner/media-sync/main/media_sync/logo-dark.png">
+  <img src="https://raw.githubusercontent.com/mkerstner/media-sync/main/media_sync/logo.png" alt="Media Sync" width="420">
+</picture>
+
+<h3>Home Assistant integration for Media Sync</h3>
+<p>Buttons, status and deletion confirmation for the app that does the syncing.</p>
+
+<a href="https://github.com/mkerstner/media-sync-integration/releases"><img alt="Release" src="https://img.shields.io/github/v/release/mkerstner/media-sync-integration?style=flat-square"></a>
+<a href="https://github.com/mkerstner/media-sync"><img alt="App" src="https://img.shields.io/badge/companion-app-03a9f4?style=flat-square"></a>
+<a href="https://hacs.xyz"><img alt="HACS" src="https://img.shields.io/badge/HACS-custom-41bdf5?style=flat-square"></a>
+
+</div>
+
+---
 
 Buttons, status and deletion confirmation for the
 [Media Sync app](https://github.com/mkerstner/media-sync), which keeps
