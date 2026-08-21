@@ -171,9 +171,13 @@ that you have turned this into a tool that deletes without asking.
 ## Deletions
 
 When a file is on one side but not the other, there is no way to tell whether
-it was deleted there or added here — so nothing is removed automatically.
-Home Assistant raises a repair notification listing the items and asks you to
-decide.
+it was deleted there or added here. So with deletion protection on — the
+default — nothing is removed automatically. Home Assistant raises a repair
+notification listing the items and asks you to decide.
+
+Deletion protection is a setting in the app, and turning it off means runs
+delete as they go. No repair notification appears then, because there is
+nothing left to confirm.
 
 ## Configuration
 
