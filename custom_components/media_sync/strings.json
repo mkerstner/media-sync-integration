@@ -68,7 +68,7 @@
       "message": "The Media Sync app is not installed."
     },
     "already_running": {
-      "message": "A sync is already running. Wait for it to finish before starting another one."
+      "message": "A sync started {since} is still running. Only one runs at a time — wait for it to finish, or watch the Status sensor."
     },
     "entry_not_found": {
       "message": "No Media Sync configuration found for {target}."

@@ -241,6 +241,15 @@ meant for a person, not a schedule. Automating it would undo the one safeguard
 that stops a sync deleting things on its own — if you automate it anyway, know
 that you have turned this into a tool that deletes without asking.
 
+## One run at a time
+
+Only one sync runs at once — the Supervisor allows a single instance of the
+app, and the integration checks with it before starting anything.
+
+While a run is in progress the buttons go unavailable, so there is nothing
+to press. The `media_sync.sync` action still answers with an error naming
+when the current run started, which is what an automation needs to see.
+
 ## Deletions
 
 When a file is on one side but not the other, there is no way to tell whether

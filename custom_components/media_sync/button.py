@@ -59,6 +59,12 @@ class MediaSyncButton(MediaSyncEntity, ButtonEntity):
 
     entity_description: MediaSyncButtonEntityDescription
 
+    @property
+    @override
+    def available(self) -> bool:
+        """Only offer the button when a run could actually start."""
+        return super().available and not self.coordinator.data.running
+
     @override
     async def async_press(self) -> None:
         """Press the button."""

@@ -102,6 +102,17 @@ class MediaSyncClient:
         """Leave the arguments for the next run where the app will find them."""
         await self._hass.async_add_executor_job(self._write_request, args)
 
+    async def async_clear_request(self) -> None:
+        """Withdraw a queued request so a later run cannot pick it up."""
+        await self._hass.async_add_executor_job(self._clear_request)
+
+    def _clear_request(self) -> None:
+        """Remove the request file, ignoring one that is already gone."""
+        try:
+            self._request_file.unlink(missing_ok=True)
+        except OSError as err:
+            LOGGER.warning("Could not remove %s: %s", self._request_file, err)
+
     def _write_request(self, args: tuple[str, ...]) -> None:
         """Write the request file."""
         try:

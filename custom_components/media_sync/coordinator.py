@@ -9,6 +9,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Context, HomeAssistant
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.util import dt as dt_util
 
 from .client import (
     STATUS_FAILED,
@@ -88,6 +89,12 @@ class MediaSyncCoordinator(DataUpdateCoordinator[SyncState]):
         async_manage_pending_deletions_issue(self.hass, self.config_entry, state)
         return state
 
+    def _started_phrase(self) -> str:
+        """Describe when the run in progress began, for the error message."""
+        if (started := self.data.started) is None:
+            return "a moment ago"
+        return f"at {dt_util.as_local(started).strftime('%H:%M')}"
+
     async def async_start_sync(
         self,
         *args: str,
@@ -95,9 +102,22 @@ class MediaSyncCoordinator(DataUpdateCoordinator[SyncState]):
         requested_by: str | None = None,
     ) -> None:
         """Queue the arguments for the next run and start the app."""
-        if self.data.running:
+        # Ask the app itself rather than trusting a poll that may be minutes
+        # old, or a second press slips through and leaves a stray request.
+        try:
+            addon_info = await self.addon_manager.async_get_addon_info()
+        except AddonError as err:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="addon_info_failed",
+                translation_placeholders={"error": str(err)},
+            ) from err
+
+        if addon_info.state is AddonState.RUNNING:
             raise ServiceValidationError(
-                translation_domain=DOMAIN, translation_key="already_running"
+                translation_domain=DOMAIN,
+                translation_key="already_running",
+                translation_placeholders={"since": self._started_phrase()},
             )
 
         await async_log_run_requested(
@@ -117,6 +137,9 @@ class MediaSyncCoordinator(DataUpdateCoordinator[SyncState]):
         try:
             await self.addon_manager.async_start_addon()
         except AddonError as err:
+            # Leaving the request behind would apply these options to some
+            # later run instead, long after anyone expects them.
+            await self.client.async_clear_request()
             await async_log(self.hass, "action", f"app would not start: {err}")
             raise HomeAssistantError(
                 translation_domain=DOMAIN,
