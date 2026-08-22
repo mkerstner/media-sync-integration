@@ -106,6 +106,13 @@
         "pull": "Remote server to Home Assistant",
         "push": "Home Assistant to remote server"
       }
+    },
+    "check_direction": {
+      "options": {
+        "app": "Whatever the app is set to",
+        "pull": "Remote server to Home Assistant",
+        "push": "Home Assistant to remote server"
+      }
     }
   },
   "services": {
@@ -162,14 +169,14 @@
     "step": {
       "init": {
         "title": "Scheduled checks",
-        "description": "The remote server cannot tell Home Assistant when something changes there, so the only way to notice is to look. Set an interval to check on your own, or leave it at 0 to only sync when you ask.\n\nEach check compares the whole tree over SSH, so it costs real time on a large library. Watch the \"Last run duration\" sensor for a few checks before choosing a short interval.",
+        "description": "A convenience, for when all you want is \"every so often\". Set an interval and a check runs on its own, doing exactly what pressing Sync does.\n\nIt is worth having because the remote server cannot announce its own changes — looking on a timer is the only way to notice them.\n\nA check uses the app's settings for everything except direction: the same folders, the same excludes, the same deletion protection, the same test-run switch. It only decides how often, and which way.\n\nEach check compares the whole tree over SSH, so on a large library it costs real time. Watch the \"Last run duration\" sensor for a few checks before choosing a short interval.\n\nFor anything more than a plain interval — only overnight, only when nobody is streaming, or triggered by something else entirely — an automation calling the Media Sync actions gives you the full range. Leave this at 0 and write one of those.",
         "data": {
-          "check_interval": "Check every (minutes)",
-          "check_direction": "What to sync on a check"
+          "check_interval": "Run a check every (minutes)",
+          "check_direction": "Which way a check should sync"
         },
         "data_description": {
-          "check_interval": "0 turns scheduled checks off.",
-          "check_direction": "Checking for remote changes only needs a pull. Both directions also sends local changes up."
+          "check_interval": "0 turns scheduled checks off, which is the default.",
+          "check_direction": "Looking for remote changes only needs a pull. Leave it on the app setting to use whatever direction the app itself is configured for."
         }
       }
     }

@@ -18,12 +18,12 @@ from homeassistant.util import dt as dt_util
 from .addon import async_discover_slug, get_addon_manager
 from .client import MediaSyncClient
 from .const import (
+    CHECK_DIRECTION_ARGS,
     CONF_ADDON_SLUG,
     CONF_CHECK_DIRECTION,
     CONF_CHECK_INTERVAL,
     DEFAULT_CHECK_DIRECTION,
     DEFAULT_CHECK_INTERVAL,
-    DIRECTION_ARGS,
     DOMAIN,
     LOGGER,
 )
@@ -101,7 +101,7 @@ def _async_schedule_checks(
         coordinator.next_check = dt_util.utcnow() + interval
         try:
             await coordinator.async_start_sync(
-                *DIRECTION_ARGS[direction], requested_by="the schedule"
+                *CHECK_DIRECTION_ARGS[direction], requested_by="the schedule"
             )
         except HomeAssistantError as err:
             # A scheduled run is nobody's service call, so it must never raise.

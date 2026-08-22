@@ -129,32 +129,74 @@ One-way, after something else has written to the library:
 
 ### Scheduled checks
 
-The remote server cannot announce its own changes, so the only way to
-notice them is to look. Set an interval under **Settings → Devices &
-services → Media Sync → Configure**:
+A convenience for the common case. Set an interval and a check runs on its
+own, doing exactly what pressing **Sync** does. It is worth having because the
+remote server cannot announce its own changes — looking on a timer is the only
+way to notice them.
+
+Set it under **Settings → Devices & services → Media Sync → Configure**:
 
 | Setting | Meaning |
 | --- | --- |
-| Check every | Minutes between checks. `0` turns it off, which is the default. |
-| What to sync on a check | `pull` looks for remote changes only. `both` also sends local changes up. |
+| Run a check every | Minutes between checks. `0` turns it off, which is the default. |
+| Which way a check should sync | `pull` for remote changes only, `push` for the reverse, or leave it on the app setting. |
 
-A check behaves like any other run, so deletion protection still applies
-and a check that finds deletions raises the usual notification rather than
-removing anything.
+#### What a check actually runs with
 
-Two sensors are there to help you choose an interval:
+A check is an ordinary run. It takes everything from the app's own settings
+and overrides only the direction:
+
+| Setting | Comes from |
+| --- | --- |
+| Folders, includes, excludes | The app |
+| Deletion protection | The app — a check never deletes while it is on |
+| Test run only | The app — if that is on, checks change nothing |
+| Remove leftover folders | The app |
+| Sync log detail | The app |
+| Direction | This option, unless left on *Whatever the app is set to* |
+
+So a check cannot do anything a manual Sync would not. If deletion protection
+is on, a check that finds deletions raises the usual notification and waits.
+
+#### Choosing an interval
+
+Two sensors help:
 
 - `sensor.media_sync_last_duration` — how long the last run took.
 - `sensor.media_sync_next_check` — when the next one is due.
 
-**Watch the duration before shortening the interval.** Every check
-compares the whole tree over SSH, so on a large library a check can take
-minutes and an aggressive interval means near-continuous load on both
-ends. Pick an interval comfortably longer than a typical run.
+**Watch the duration before shortening the interval.** Every check compares
+the whole tree over SSH, so on a large library a check can take minutes, and
+an aggressive interval means near-continuous load on both ends. Pick an
+interval comfortably longer than a typical run.
 
-Doing it with an automation instead works too, and gives you conditions
-the built-in schedule does not have — only at night, only when nobody is
-streaming, and so on.
+#### When an automation is the better answer
+
+The interval is deliberately the only knob. For anything else — conditions, a
+schedule helper, reacting to another entity, per-run options — write an
+automation calling the Media Sync actions and leave the interval at 0:
+
+```yaml
+automation:
+  - alias: "Overnight media check"
+    triggers:
+      - trigger: time_pattern
+        hours: "/2"
+    conditions:
+      - condition: time
+        after: "23:00:00"
+        before: "07:00:00"
+      - condition: state
+        entity_id: media_player.living_room
+        state: "idle"
+    actions:
+      - action: media_sync.sync
+        data:
+          config_entry: 01JQ8ZK4M7WXYZ0123456789AB
+          direction: pull
+```
+
+That also gives you traces, which the built-in interval does not.
 
 ### Reacting to what a sync finds
 

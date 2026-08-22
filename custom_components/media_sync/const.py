@@ -47,6 +47,16 @@ ISSUE_PENDING_DELETIONS: Final = "pending_deletions"
 MAX_LISTED_DELETIONS: Final = 25
 
 CONF_CHECK_INTERVAL: Final = "check_interval"
+
+# A scheduled check can only override the direction. Sending no arguments
+# leaves the app to use whatever direction its own settings say, so that is
+# named honestly rather than being called "both".
+CHECK_DIRECTION_APP: Final = "app"
+CHECK_DIRECTION_ARGS: Final = {
+    CHECK_DIRECTION_APP: (),
+    DIRECTION_PULL: (ARG_PULL_ONLY,),
+    DIRECTION_PUSH: (ARG_PUSH_ONLY,),
+}
 CONF_CHECK_DIRECTION: Final = "check_direction"
 
 # 0 turns scheduled checks off, which is the default.

@@ -24,12 +24,12 @@ from homeassistant.helpers.selector import (
 from .addon import async_discover_store_slug, get_addon_manager
 from .const import (
     ADDON_NAME,
+    CHECK_DIRECTION_ARGS,
     CONF_ADDON_SLUG,
     CONF_CHECK_DIRECTION,
     CONF_CHECK_INTERVAL,
     DEFAULT_CHECK_DIRECTION,
     DEFAULT_CHECK_INTERVAL,
-    DIRECTION_ARGS,
     DOMAIN,
 )
 
@@ -50,8 +50,8 @@ OPTIONS_SCHEMA = vol.Schema(
             CONF_CHECK_DIRECTION, default=DEFAULT_CHECK_DIRECTION
         ): SelectSelector(
             SelectSelectorConfig(
-                options=list(DIRECTION_ARGS),
-                translation_key="direction",
+                options=list(CHECK_DIRECTION_ARGS),
+                translation_key="check_direction",
             )
         ),
     }
