@@ -12,11 +12,17 @@
       }
     },
     "sensor": {
+      "last_duration": {
+        "default": "mdi:timer-outline"
+      },
       "last_run": {
         "default": "mdi:clock-outline"
       },
       "last_successful_sync": {
         "default": "mdi:clock-check-outline"
+      },
+      "next_check": {
+        "default": "mdi:calendar-clock"
       },
       "pending_deletions": {
         "default": "mdi:trash-can-outline"

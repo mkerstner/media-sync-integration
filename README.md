@@ -43,6 +43,8 @@ Needs [HACS](https://hacs.xyz), and the Media Sync app installed first.
 | `sensor.media_sync_pending_deletions` | How many items are awaiting a decision |
 | `sensor.media_sync_last_successful_sync` | When the last real sync finished |
 | `sensor.media_sync_last_run` | When anything last ran |
+| `sensor.media_sync_last_duration` | How long the last run took |
+| `sensor.media_sync_next_check` | When the next scheduled check is due |
 
 Actions for automations: `media_sync.sync` (with a direction and a dry-run
 option), `media_sync.scan_deletions`, `media_sync.get_pending_deletions`, and
@@ -125,6 +127,35 @@ One-way, after something else has written to the library:
           direction: push
 ```
 
+### Scheduled checks
+
+The remote server cannot announce its own changes, so the only way to
+notice them is to look. Set an interval under **Settings → Devices &
+services → Media Sync → Configure**:
+
+| Setting | Meaning |
+| --- | --- |
+| Check every | Minutes between checks. `0` turns it off, which is the default. |
+| What to sync on a check | `pull` looks for remote changes only. `both` also sends local changes up. |
+
+A check behaves like any other run, so deletion protection still applies
+and a check that finds deletions raises the usual notification rather than
+removing anything.
+
+Two sensors are there to help you choose an interval:
+
+- `sensor.media_sync_last_duration` — how long the last run took.
+- `sensor.media_sync_next_check` — when the next one is due.
+
+**Watch the duration before shortening the interval.** Every check
+compares the whole tree over SSH, so on a large library a check can take
+minutes and an aggressive interval means near-continuous load on both
+ends. Pick an interval comfortably longer than a typical run.
+
+Doing it with an automation instead works too, and gives you conditions
+the built-in schedule does not have — only at night, only when nobody is
+streaming, and so on.
+
 ### Reacting to what a sync finds
 
 Nothing is ever deleted without you confirming it, so a sync can end with items
@@ -181,8 +212,9 @@ nothing left to confirm.
 
 ## Configuration
 
-There is nothing to configure here. Which server and which folders are set up
-in the app's own settings, so the sync script stays usable on its own.
+Only the scheduled check interval, under **Configure**. Which server and which
+folders are set up in the app's own settings, so the sync script stays usable
+on its own.
 
 ---
 

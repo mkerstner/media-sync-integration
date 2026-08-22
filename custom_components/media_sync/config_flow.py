@@ -6,10 +6,56 @@ from typing import Any, override
 import voluptuous as vol
 
 from homeassistant.components.hassio import AddonError, AddonState, SupervisorError
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+)
+from homeassistant.core import callback
+from homeassistant.helpers.selector import (
+    NumberSelector,
+    NumberSelectorConfig,
+    NumberSelectorMode,
+    SelectSelector,
+    SelectSelectorConfig,
+)
 
 from .addon import async_discover_store_slug, get_addon_manager
-from .const import ADDON_NAME, CONF_ADDON_SLUG, DOMAIN, LOGGER
+from .const import (
+    ADDON_NAME,
+    CONF_ADDON_SLUG,
+    CONF_CHECK_DIRECTION,
+    CONF_CHECK_INTERVAL,
+    DEFAULT_CHECK_DIRECTION,
+    DEFAULT_CHECK_INTERVAL,
+    DIRECTION_ARGS,
+    DOMAIN,
+)
+
+
+OPTIONS_SCHEMA = vol.Schema(
+    {
+        vol.Required(
+            CONF_CHECK_INTERVAL, default=DEFAULT_CHECK_INTERVAL
+        ): vol.All(
+            NumberSelector(
+                NumberSelectorConfig(
+                    min=0, max=1440, step=5, mode=NumberSelectorMode.BOX
+                )
+            ),
+            vol.Coerce(int),
+        ),
+        vol.Required(
+            CONF_CHECK_DIRECTION, default=DEFAULT_CHECK_DIRECTION
+        ): SelectSelector(
+            SelectSelectorConfig(
+                options=list(DIRECTION_ARGS),
+                translation_key="direction",
+            )
+        ),
+    }
+)
 
 
 class MediaSyncConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -106,4 +152,28 @@ class MediaSyncConfigFlow(ConfigFlow, domain=DOMAIN):
         """Create the config entry for the discovered app."""
         return self.async_create_entry(
             title=ADDON_NAME, data={CONF_ADDON_SLUG: self.slug}
+        )
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> MediaSyncOptionsFlow:
+        """Get the options flow."""
+        return MediaSyncOptionsFlow()
+
+
+class MediaSyncOptionsFlow(OptionsFlow):
+    """Handle the Media Sync options."""
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Set how often the app should check the remote server."""
+        if user_input is not None:
+            return self.async_create_entry(data=user_input)
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=self.add_suggested_values_to_schema(
+                OPTIONS_SCHEMA, self.config_entry.options
+            ),
         )

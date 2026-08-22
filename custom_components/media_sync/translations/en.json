@@ -51,6 +51,12 @@
           "ok": "Completed",
           "running": "Running"
         }
+      },
+      "last_duration": {
+        "name": "Last run duration"
+      },
+      "next_check": {
+        "name": "Next scheduled check"
       }
     }
   },
@@ -150,6 +156,22 @@
         }
       },
       "name": "Sync"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Scheduled checks",
+        "description": "The remote server cannot tell Home Assistant when something changes there, so the only way to notice is to look. Set an interval to check on your own, or leave it at 0 to only sync when you ask.\n\nEach check compares the whole tree over SSH, so it costs real time on a large library. Watch the \"Last run duration\" sensor for a few checks before choosing a short interval.",
+        "data": {
+          "check_interval": "Check every (minutes)",
+          "check_direction": "What to sync on a check"
+        },
+        "data_description": {
+          "check_interval": "0 turns scheduled checks off.",
+          "check_direction": "Checking for remote changes only needs a pull. Both directions also sends local changes up."
+        }
+      }
     }
   }
 }

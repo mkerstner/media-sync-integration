@@ -1,6 +1,7 @@
 """Coordinator for the Media Sync integration."""
 
 from dataclasses import replace
+from datetime import datetime
 from typing import override
 
 from homeassistant.components.hassio import AddonError, AddonManager, AddonState
@@ -50,6 +51,7 @@ class MediaSyncCoordinator(DataUpdateCoordinator[SyncState]):
         )
         self.client = client
         self.addon_manager = addon_manager
+        self.next_check: datetime | None = None
 
     @override
     async def _async_update_data(self) -> SyncState:

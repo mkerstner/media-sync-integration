@@ -45,3 +45,10 @@ ISSUE_PENDING_DELETIONS: Final = "pending_deletions"
 
 # Longest list of paths rendered into the repair issue description.
 MAX_LISTED_DELETIONS: Final = 25
+
+CONF_CHECK_INTERVAL: Final = "check_interval"
+CONF_CHECK_DIRECTION: Final = "check_direction"
+
+# 0 turns scheduled checks off, which is the default.
+DEFAULT_CHECK_INTERVAL: Final = 0
+DEFAULT_CHECK_DIRECTION: Final = DIRECTION_PULL
