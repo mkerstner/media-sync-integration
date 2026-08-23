@@ -1,9 +1,6 @@
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/mkerstner/media-sync/main/media_sync/logo-dark.png">
-  <img src="https://raw.githubusercontent.com/mkerstner/media-sync/main/media_sync/logo.png" alt="Media Sync" width="420">
-</picture>
+<img src="https://raw.githubusercontent.com/mkerstner/media-sync/main/media_sync/logo.png" alt="Media Sync" width="420">
 
 <h3>Home Assistant integration for Media Sync</h3>
 <p>Buttons, status and deletion confirmation for the app that does the syncing.</p>
