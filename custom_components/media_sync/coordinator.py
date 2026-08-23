@@ -19,6 +19,7 @@ from .client import (
     SyncState,
 )
 from .const import (
+    ARG_RESOLVE,
     DOMAIN,
     LOGGER,
     UPDATE_INTERVAL_IDLE,
@@ -94,6 +95,32 @@ class MediaSyncCoordinator(DataUpdateCoordinator[SyncState]):
         if (started := self.data.started) is None:
             return "a moment ago"
         return f"at {dt_util.as_local(started).strftime('%H:%M')}"
+
+    async def async_resolve(
+        self,
+        decisions: list[tuple[str, str, str]],
+        context: Context | None = None,
+        requested_by: str | None = None,
+    ) -> None:
+        """Record keep/delete choices and have the app carry them out."""
+        if not decisions:
+            return
+
+        try:
+            await self.client.async_write_decisions(decisions)
+        except MediaSyncError as err:
+            await async_log(self.hass, "action", f"decisions were not saved: {err}")
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="decisions_failed",
+                translation_placeholders={"error": str(err)},
+            ) from err
+
+        # The app reads the decisions file itself, so a resolve run needs no
+        # arguments beyond being told that is what it is.
+        await self.async_start_sync(
+            ARG_RESOLVE, context=context, requested_by=requested_by
+        )
 
     async def async_start_sync(
         self,

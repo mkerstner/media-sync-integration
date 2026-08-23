@@ -258,6 +258,40 @@ Deletion protection is a setting in the app, and turning it off means runs
 delete as they go. No repair notification appears then, because there is
 nothing left to confirm.
 
+### Reviewing folder by folder
+
+Opening the notification asks what to keep, one folder at a time:
+
+```
+[x] Photos pull — 2019/jan   (412 files, on Home Assistant only)
+[ ] Photos pull — 2020        (38 files, on Home Assistant only)
+[x] Docs push  — Notes         (2 files, on the server only)
+```
+
+**Ticked folders are kept** — their files are copied to the side that is
+missing them. **Unticked folders are deleted** — their files are removed from
+the side that still has them. Everything starts ticked, so confirming without
+reading deletes nothing.
+
+Keeping is what actually clears an item. An item that was *added* on one side
+has no business being deleted, and before this the only outcomes were "delete
+everything" or "leave it", so anything left alone came back on every run.
+
+Three things worth knowing:
+
+- **Grouping is presentation only.** Deciding on a folder acts on the recorded
+  candidates inside it and nothing else. A folder holding two candidates
+  usually holds hundreds of correctly synced files, and those are never
+  touched.
+- **The grouping adapts.** It stays as specific as it can and only rolls up to
+  a shallower level when there would otherwise be too many rows.
+- **Deletions are re-checked as they are applied.** Anything that has since
+  appeared on the other side is skipped, so a notification can sit unanswered
+  without becoming unsafe.
+
+This needs Media Sync app 1.5.0 or newer. With an older app the notification
+falls back to the previous all-or-nothing question.
+
 ## Configuration
 
 Only the scheduled check interval, under **Configure**. Which server and which

@@ -67,6 +67,9 @@
     "addon_not_installed": {
       "message": "The Media Sync app is not installed."
     },
+    "decisions_failed": {
+      "message": "Could not save your choices: {error}"
+    },
     "already_running": {
       "message": "A sync started {since} is still running. Only one runs at a time — wait for it to finish, or watch the Status sensor."
     },
@@ -90,13 +93,27 @@
     "pending_deletions": {
       "fix_flow": {
         "step": {
+          "review": {
+            "description": "The last sync found {count} item(s) that are on one side but not the other, and left them alone.\n\nSomething can be missing because it was deleted there, or because it was just added here — there is no way to tell the two apart, so you decide.\n\n**Ticked folders are kept**, and their files are copied to the side that is missing them. **Unticked folders are deleted**, and their files are removed from the side that still has them.\n\nEverything starts ticked, so nothing is deleted unless you untick it. Deciding on a folder only affects the items listed here — files that are already in sync are never touched.",
+            "title": "What should be kept?",
+            "data": {
+              "keep": "Folders to keep"
+            },
+            "data_description": {
+              "keep": "Untick a folder to delete the items it holds."
+            }
+          },
+          "apply": {
+            "description": "**Keep and copy:** {keep_count} item(s)\n\n**Delete for good:** {delete_count} item(s)\n\n{delete_list}\n\nDeletions are checked once more as they are applied, so anything that has since appeared on the other side is left alone.",
+            "title": "Confirm these choices"
+          },
           "confirm": {
-            "description": "The last sync found {count} item(s) that are on one side but not the other, and left them alone.\n\n{deletions}\n\nSomething can be missing because it was deleted there, or because it was just added here — there is no way to tell the two apart. If you confirm, the sync runs again and removes these items for good. The list is checked again at that moment, so anything that changed in the meantime is taken into account.",
+            "description": "The last sync found {count} item(s) that are on one side but not the other, and left them alone.\n\n{deletions}\n\nSomething can be missing because it was deleted there, or because it was just added here — there is no way to tell the two apart. If you confirm, the sync runs again and removes these items for good. The list is checked again at that moment, so anything that changed in the meantime is taken into account.\n\nUpdate the Media Sync app to review these folder by folder and choose what to keep.",
             "title": "Confirm these deletions"
           }
         }
       },
-      "title": "Media Sync wants to delete {count} item(s)"
+      "title": "Media Sync found {count} item(s) to review"
     }
   },
   "selector": {

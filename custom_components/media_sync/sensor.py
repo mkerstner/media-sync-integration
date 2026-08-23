@@ -52,7 +52,7 @@ SENSORS: tuple[MediaSyncSensorEntityDescription, ...] = (
     MediaSyncSensorEntityDescription(
         key="pending_deletions",
         translation_key="pending_deletions",
-        value_fn=lambda state: len(state.pending),
+        value_fn=lambda state: state.pending_count,
     ),
     MediaSyncSensorEntityDescription(
         key="last_successful_sync",

@@ -95,8 +95,22 @@ def async_setup_services(hass: HomeAssistant) -> None:
     async def async_get_pending_deletions(call: ServiceCall) -> ServiceResponse:
         """Return the paths a confirmed deletion would remove."""
         entry = _async_get_entry(hass, call)
-        pending = entry.runtime_data.data.pending
-        return {"count": len(pending), "deletions": list(pending)}
+        state = entry.runtime_data.data
+        # The app caps the flat list, so the count and the list can disagree
+        # on a large run. Report both rather than implying the list is whole.
+        return {
+            "count": state.pending_count,
+            "deletions": list(state.pending),
+            "groups": [
+                {
+                    "label": group.label,
+                    "side": group.side,
+                    "folder": group.folder,
+                    "count": group.count,
+                }
+                for group in state.groups
+            ],
+        }
 
     hass.services.async_register(DOMAIN, SERVICE_SYNC, async_sync, schema=SYNC_SCHEMA)
     hass.services.async_register(
