@@ -264,10 +264,10 @@ Opening the notification asks what should happen, folder by folder:
 
 ```
 [ ] Copy all folders
-Or pick folders to copy:    [ ] Documents pull — Notes/2019  (12 files, on the server only)
+Or pick folders to copy:    [ ] Documents pull — Notes/draft.md — on the server only
 
 [x] Delete all folders
-Or pick folders to delete:  [ ] Documents pull — Notes/2020  (38 files, on Home Assistant only)
+Or pick folders to delete:  [ ] Photos pull — 2019/jan — 38 files incl. a.jpg, b.jpg — on Home Assistant only
 ```
 
 There are two ways to choose. Turn on a toggle to apply that action to *every*
@@ -297,6 +297,10 @@ Three things worth knowing:
   touched.
 - **The grouping adapts.** It stays as specific as it can and only rolls up to
   a shallower level when there would otherwise be too many rows.
+- **Rows name files, not just folders.** A row standing for a single file shows
+  that file. A row standing for several shows the count and the first couple of
+  names. Needs app 1.6.0; with an older app the names are derived where possible
+  and otherwise only the count is shown.
 - **Deletions are re-checked as they are applied.** Anything that has since
   appeared on the other side is skipped, so a notification can sit unanswered
   without becoming unsafe.

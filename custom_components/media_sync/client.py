@@ -1,6 +1,6 @@
 """Read and drive the state the Media Sync app records."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 import json
 from pathlib import Path
@@ -9,7 +9,14 @@ from typing import Any, Final, Self
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
 
-from .const import DECISIONS_PATH, LOGGER, REQUEST_PATH, STATE_PATH
+from .const import (
+    DECISIONS_PATH,
+    LOGGER,
+    MAX_EXAMPLES,
+    REQUEST_PATH,
+    ROOT_GROUP,
+    STATE_PATH,
+)
 
 STATUS_IDLE: Final = "idle"
 STATUS_RUNNING: Final = "running"
@@ -36,6 +43,10 @@ class PendingGroup:
     side: str
     folder: str
     count: int
+    # A few real paths, relative to the folder above. A folder name says
+    # nothing when it stands for a single file. Empty when the app predates
+    # 1.6.0, in which case the integration derives them from the flat list.
+    examples: list[str] = field(default_factory=list)
 
     @property
     def key(self) -> str:
@@ -57,11 +68,13 @@ class PendingGroup:
             count = int(data.get("count", 0))
         except (TypeError, ValueError):
             count = 0
+        raw = data.get("examples") or []
         return cls(
             label=label,
             side=str(data.get("side", "")),
             folder=folder,
             count=count,
+            examples=[str(item) for item in raw][:MAX_EXAMPLES],
         )
 
 
@@ -118,10 +131,52 @@ class SyncState:
             finished=_parse_timestamp(data.get("finished")),
             last_success=_parse_timestamp(data.get("last_success")),
             pending=pending,
-            groups=groups,
+            groups=_with_derived_examples(groups, pending),
             pending_count=count,
             error=data.get("error") or None,
         )
+
+
+def _relative(folder: str, path: str) -> str | None:
+    """Return path relative to folder, or None when it is not inside it."""
+    if folder == ROOT_GROUP:
+        return path if "/" not in path else None
+    prefix = f"{folder}/"
+    return path[len(prefix) :] if path.startswith(prefix) else None
+
+
+def _with_derived_examples(
+    groups: list[PendingGroup], pending: list[str]
+) -> list[PendingGroup]:
+    """Fill in examples from the flat list, for an app older than 1.6.0.
+
+    The flat list is capped by the app, so a group beyond the cap simply keeps
+    none and falls back to showing its count. Once the app supplies examples
+    itself this does nothing.
+    """
+    if not groups or all(group.examples for group in groups):
+        return groups
+
+    by_label: dict[str, list[str]] = {}
+    for entry in pending:
+        label, separator, path = entry.partition(": ")
+        if separator:
+            by_label.setdefault(label, []).append(path)
+
+    filled: list[PendingGroup] = []
+    for group in groups:
+        if group.examples:
+            filled.append(group)
+            continue
+        found: list[str] = []
+        for path in by_label.get(group.label, []):
+            relative = _relative(group.folder, path)
+            if relative is not None:
+                found.append(relative)
+                if len(found) >= MAX_EXAMPLES:
+                    break
+        filled.append(replace(group, examples=found))
+    return filled
 
 
 def _parse_timestamp(value: Any) -> datetime | None:

@@ -54,8 +54,10 @@ def _format_groups(groups: list[PendingGroup]) -> str:
     """Render reviewed folders as a markdown list."""
     if not groups:
         return "- nothing"
+    # This is the last thing seen before files are destroyed, so it names them
+    # rather than only the folder they sit in.
     listed = [
-        f"- `{group.label}` — {group.folder}"
+        f"- `{group.label}` — {_group_what(group)}"
         for group in groups[:MAX_LISTED_DELETIONS]
     ]
     if len(groups) > MAX_LISTED_DELETIONS:
@@ -97,12 +99,27 @@ def _side_phrase(side: str) -> str:
     return "on one side only"
 
 
+def _group_what(group: PendingGroup) -> str:
+    """Describe what a row stands for, naming files wherever it can.
+
+    A count exists to stand in for files that cannot be shown. When there is
+    exactly one, showing it beats counting it, so the folder and the count
+    both go and the path takes their place.
+    """
+    root = group.folder == ROOT_GROUP
+    if group.count == 1 and group.examples:
+        return group.examples[0] if root else f"{group.folder}/{group.examples[0]}"
+
+    where = "files at the top level" if root else group.folder
+    files = "file" if group.count == 1 else "files"
+    if not group.examples:
+        return f"{where} — {group.count} {files}"
+    return f"{where} — {group.count} {files} incl. {', '.join(group.examples)}"
+
+
 def _group_label(group: PendingGroup) -> str:
     """Render one reviewable row."""
-    folder = "files at the top level" if group.folder == ROOT_GROUP else group.folder
-    files = "file" if group.count == 1 else "files"
-    where = _side_phrase(group.side)
-    return f"{group.label} — {folder} ({group.count} {files}, {where})"
+    return f"{group.label} — {_group_what(group)} — {_side_phrase(group.side)}"
 
 
 class PendingDeletionsRepairFlow(RepairsFlow):

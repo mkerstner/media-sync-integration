@@ -107,6 +107,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
                     "side": group.side,
                     "folder": group.folder,
                     "count": group.count,
+                    "examples": list(group.examples),
                 }
                 for group in state.groups
             ],

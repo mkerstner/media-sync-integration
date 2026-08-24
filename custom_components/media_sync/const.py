@@ -91,3 +91,6 @@ CONF_DELETE: Final = "delete"
 # not reactive, so these stand in for a full list rather than ticking it.
 CONF_KEEP_ALL: Final = "keep_all"
 CONF_DELETE_ALL: Final = "delete_all"
+
+# Example paths shown per review group. Two fits a form row without wrapping.
+MAX_EXAMPLES: Final = 2
