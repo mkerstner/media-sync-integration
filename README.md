@@ -263,17 +263,20 @@ nothing left to confirm.
 Opening the notification asks what should happen, folder by folder:
 
 ```
-[ ] Copy everything
-Copy to the other side:  [ ] Documents pull — Notes/2019  (12 files, on the server only)
+[ ] Copy all folders
+Or pick folders to copy:    [ ] Documents pull — Notes/2019  (12 files, on the server only)
 
-[x] Delete everything
-Delete for good:         [ ] Documents pull — Notes/2020  (38 files, on Home Assistant only)
+[x] Delete all folders
+Or pick folders to delete:  [ ] Documents pull — Notes/2020  (38 files, on Home Assistant only)
 ```
 
-Each list has a **select all** box above it. Home Assistant forms are not
-reactive, so ticking it does not fill in the list below — it stands in for the
-whole list, and the list is ignored while it is set. That is the quick path
-when a whole run goes one way.
+There are two ways to choose. Turn on a toggle to apply that action to *every*
+folder, or leave it off and tick folders in the list below it. Home Assistant
+forms are not reactive, so **the toggle does not tick the boxes for you** —
+while it is on, the list under it is ignored completely.
+
+A whole run usually goes one way, so the toggles are the short path. Reach for
+the lists when it does not.
 
 **Copy** puts files back on the side that is missing them — use it when they
 were added, not deleted. **Delete** removes them from the side that still has
