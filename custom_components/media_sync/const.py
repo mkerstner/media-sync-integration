@@ -82,3 +82,7 @@ SIDE_REMOTE: Final = "remote"
 
 # Form field holding the folders the user chose to keep.
 CONF_KEEP: Final = "keep"
+
+# Form field holding the folders the user chose to delete. Kept separate from
+# CONF_KEEP so deleting is an outright choice rather than the absence of one.
+CONF_DELETE: Final = "delete"

@@ -260,22 +260,23 @@ nothing left to confirm.
 
 ### Reviewing folder by folder
 
-Opening the notification asks what to keep, one folder at a time:
+Opening the notification asks what should happen, folder by folder:
 
 ```
-[x] Photos pull — 2019/jan   (412 files, on Home Assistant only)
-[ ] Photos pull — 2020        (38 files, on Home Assistant only)
-[x] Docs push  — Notes         (2 files, on the server only)
+Copy to the other side:  [ ] Documents pull — Notes/2019  (12 files, on the server only)
+Delete for good:         [x] Documents pull — Notes/2020  (38 files, on Home Assistant only)
 ```
 
-**Ticked folders are kept** — their files are copied to the side that is
-missing them. **Unticked folders are deleted** — their files are removed from
-the side that still has them. Everything starts ticked, so confirming without
-reading deletes nothing.
+**Copy** puts files back on the side that is missing them — use it when they
+were added, not deleted. **Delete** removes them from the side that still has
+them — use it when they were deleted on purpose and that should carry across.
 
-Keeping is what actually clears an item. An item that was *added* on one side
-has no business being deleted, and before this the only outcomes were "delete
-everything" or "leave it", so anything left alone came back on every run.
+Both lists start empty, so nothing happens by default. Anything you leave out
+of both stays pending, so you can decide on part of it now and the rest later.
+
+Copying is what actually clears an item that was *added* on one side. Before
+this the only outcomes were "delete everything" or "leave it", so anything left
+alone came back on every run.
 
 Three things worth knowing:
 

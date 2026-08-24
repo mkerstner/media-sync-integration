@@ -20,6 +20,7 @@ from .const import (
     ACTION_DELETE,
     ACTION_KEEP,
     ARG_ASSUME_YES,
+    CONF_DELETE,
     CONF_KEEP,
     DOMAIN,
     ISSUE_PENDING_DELETIONS,
@@ -109,6 +110,7 @@ class PendingDeletionsRepairFlow(RepairsFlow):
         self.entry = entry
         self._keep: list[PendingGroup] = []
         self._delete: list[PendingGroup] = []
+        self._skipped: list[PendingGroup] = []
 
     @override
     async def async_step_init(
@@ -126,38 +128,58 @@ class PendingDeletionsRepairFlow(RepairsFlow):
     async def async_step_review(
         self, user_input: dict[str, Any] | None = None
     ) -> RepairsFlowResult:
-        """Ask which folders to keep. Everything else is up for deletion."""
+        """Ask what to copy and what to delete, as two separate choices.
+
+        Both lists start empty. Deleting is then something chosen outright,
+        rather than something that happens to whatever was not ticked, and
+        anything left out of both lists simply stays pending.
+        """
         coordinator = self.entry.runtime_data
         groups = coordinator.data.groups
+        errors: dict[str, str] = {}
 
         if user_input is not None:
-            chosen = set(user_input.get(CONF_KEEP, []))
-            self._keep = [group for group in groups if group.key in chosen]
-            self._delete = [group for group in groups if group.key not in chosen]
-            return await self.async_step_apply()
+            keep_keys = set(user_input.get(CONF_KEEP, []))
+            delete_keys = set(user_input.get(CONF_DELETE, []))
+            if keep_keys & delete_keys:
+                errors["base"] = "both_lists"
+            elif not keep_keys and not delete_keys:
+                errors["base"] = "nothing_chosen"
+            else:
+                self._keep = [g for g in groups if g.key in keep_keys]
+                self._delete = [g for g in groups if g.key in delete_keys]
+                self._skipped = [
+                    g
+                    for g in groups
+                    if g.key not in keep_keys and g.key not in delete_keys
+                ]
+                return await self.async_step_apply()
 
-        # Everything starts checked, so confirming without reading deletes
-        # nothing. Unchecking is the deliberate act.
+        options = [
+            SelectOptionDict(value=group.key, label=_group_label(group))
+            for group in groups
+        ]
         return self.async_show_form(
             step_id="review",
             data_schema=vol.Schema(
                 {
-                    vol.Optional(
-                        CONF_KEEP, default=[group.key for group in groups]
-                    ): SelectSelector(
+                    vol.Optional(CONF_KEEP, default=[]): SelectSelector(
                         SelectSelectorConfig(
-                            options=[
-                                SelectOptionDict(
-                                    value=group.key, label=_group_label(group)
-                                )
-                                for group in groups
-                            ],
+                            options=options,
                             multiple=True,
                             mode=SelectSelectorMode.LIST,
                         )
-                    )
+                    ),
+                    vol.Optional(CONF_DELETE, default=[]): SelectSelector(
+                        SelectSelectorConfig(
+                            options=options,
+                            multiple=True,
+                            mode=SelectSelectorMode.LIST,
+                        )
+                    ),
                 }
             ),
+            errors=errors,
             description_placeholders={"count": str(coordinator.data.pending_count)},
         )
 
@@ -180,6 +202,7 @@ class PendingDeletionsRepairFlow(RepairsFlow):
             description_placeholders={
                 "keep_count": str(sum(group.count for group in self._keep)),
                 "delete_count": str(sum(group.count for group in self._delete)),
+                "skipped_count": str(sum(group.count for group in self._skipped)),
                 "delete_list": _format_groups(self._delete),
             },
         )
