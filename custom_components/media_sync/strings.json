@@ -101,11 +101,15 @@
             "description": "The last sync found {count} item(s) that are on one side but not the other, and left them alone.\n\nSomething can be missing because it was deleted there, or because it was just added here — there is no way to tell the two apart, so you decide.\n\n**Copy** a folder when its files were added and the other side should get them.\n\n**Delete** a folder when its files were deleted on purpose and the side that still has them should let them go.\n\nBoth lists start empty. Anything you leave out of both stays pending, so you can decide on part of it now and the rest later. Deciding on a folder only affects the items counted here — files that are already in sync are never touched.",
             "title": "What should happen?",
             "data": {
+              "keep_all": "Copy everything",
               "keep": "Copy to the other side",
+              "delete_all": "Delete everything",
               "delete": "Delete for good"
             },
             "data_description": {
+              "keep_all": "Copy every folder listed below, without ticking them one by one. The list is then ignored.",
               "keep": "The files are missing on the other side and should be put back.",
+              "delete_all": "Delete every folder listed below, without ticking them one by one. The list is then ignored.",
               "delete": "The files were deleted on purpose and should go from the side that still has them."
             }
           },

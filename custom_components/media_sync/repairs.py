@@ -9,6 +9,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.selector import (
+    BooleanSelector,
     SelectOptionDict,
     SelectSelector,
     SelectSelectorConfig,
@@ -21,7 +22,9 @@ from .const import (
     ACTION_KEEP,
     ARG_ASSUME_YES,
     CONF_DELETE,
+    CONF_DELETE_ALL,
     CONF_KEEP,
+    CONF_KEEP_ALL,
     DOMAIN,
     ISSUE_PENDING_DELETIONS,
     MAX_LISTED_DELETIONS,
@@ -138,9 +141,22 @@ class PendingDeletionsRepairFlow(RepairsFlow):
         groups = coordinator.data.groups
         errors: dict[str, str] = {}
 
+        all_keys = {group.key for group in groups}
+
         if user_input is not None:
-            keep_keys = set(user_input.get(CONF_KEEP, []))
-            delete_keys = set(user_input.get(CONF_DELETE, []))
+            # Home Assistant forms are not reactive, so a "select all" box
+            # cannot tick the list beside it. It stands in for the whole list
+            # instead, and the list itself is ignored when it is set.
+            keep_keys = (
+                all_keys
+                if user_input.get(CONF_KEEP_ALL)
+                else set(user_input.get(CONF_KEEP, []))
+            )
+            delete_keys = (
+                all_keys
+                if user_input.get(CONF_DELETE_ALL)
+                else set(user_input.get(CONF_DELETE, []))
+            )
             if keep_keys & delete_keys:
                 errors["base"] = "both_lists"
             elif not keep_keys and not delete_keys:
@@ -163,6 +179,7 @@ class PendingDeletionsRepairFlow(RepairsFlow):
             step_id="review",
             data_schema=vol.Schema(
                 {
+                    vol.Optional(CONF_KEEP_ALL, default=False): BooleanSelector(),
                     vol.Optional(CONF_KEEP, default=[]): SelectSelector(
                         SelectSelectorConfig(
                             options=options,
@@ -170,6 +187,7 @@ class PendingDeletionsRepairFlow(RepairsFlow):
                             mode=SelectSelectorMode.LIST,
                         )
                     ),
+                    vol.Optional(CONF_DELETE_ALL, default=False): BooleanSelector(),
                     vol.Optional(CONF_DELETE, default=[]): SelectSelector(
                         SelectSelectorConfig(
                             options=options,

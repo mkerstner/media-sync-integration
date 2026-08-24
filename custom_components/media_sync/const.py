@@ -86,3 +86,8 @@ CONF_KEEP: Final = "keep"
 # Form field holding the folders the user chose to delete. Kept separate from
 # CONF_KEEP so deleting is an outright choice rather than the absence of one.
 CONF_DELETE: Final = "delete"
+
+# "Select all" companions for the two review lists. Home Assistant forms are
+# not reactive, so these stand in for a full list rather than ticking it.
+CONF_KEEP_ALL: Final = "keep_all"
+CONF_DELETE_ALL: Final = "delete_all"
