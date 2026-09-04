@@ -220,8 +220,10 @@ automation:
             {{ pending.deletions | join('\n') }}
 ```
 
-`media_sync.get_pending_deletions` returns `count` and `deletions`, so the
-message lists the actual paths.
+`media_sync.get_pending_deletions` returns `count`, `deletions` and
+`groups`. The first two give you the total and the paths; `groups` is the
+folder-by-folder view, each entry carrying `label`, `side`, `folder`,
+`count` and a couple of example filenames.
 
 To catch failures, trigger on the status sensor instead:
 
@@ -230,6 +232,100 @@ To catch failures, trigger on the status sensor instead:
         entity_id: sensor.media_sync_status
         to: failed
 ```
+
+### Emailing the result
+
+A run's outcome makes a reasonable email. Use `groups` rather than
+`deletions` for the body: a run can turn up thousands of paths, and the
+folder view is the one a person can read over breakfast.
+
+```yaml
+automation:
+  - alias: "Email the Media Sync result"
+    triggers:
+      - trigger: state
+        entity_id: sensor.media_sync_status
+        to:
+          - ok
+          - failed
+    actions:
+      - action: media_sync.get_pending_deletions
+        data:
+          config_entry: 01JQ8ZK4M7WXYZ0123456789AB
+        response_variable: pending
+      - action: smtp.send_message
+        target:
+          entity_id: notify.YOUR_SMTP_ENTITY
+        data:
+          title: >-
+            Media Sync {{ 'completed' if trigger.to_state.state == 'ok' else 'FAILED' }}
+            - {{ pending.count }} item(s) to review
+          message: >-
+            Media Sync {{ trigger.to_state.state }}.
+            {{ pending.count }} item(s) exist on one side only.
+          html: |
+            <html><body style="font-family:system-ui,sans-serif">
+              <h2>Media Sync {{ 'completed' if trigger.to_state.state == 'ok' else 'failed' }}</h2>
+              <p>
+                Finished {{ states('sensor.media_sync_last_run') }}<br>
+                Took {{ states('sensor.media_sync_last_duration') }}<br>
+                Last clean sync {{ states('sensor.media_sync_last_successful_sync') }}
+              </p>
+
+              {% if pending.count > 0 %}
+                <h3>{{ pending.count }} item(s) on one side only</h3>
+                <table cellpadding="6" border="1" style="border-collapse:collapse">
+                  <tr>
+                    <th align="left">Pair</th><th align="left">Folder</th>
+                    <th align="right">Files</th><th align="left">Where</th>
+                    <th align="left">For example</th>
+                  </tr>
+                  {% for g in pending.groups %}
+                    <tr>
+                      <td>{{ g.label }}</td>
+                      <td>{{ g.folder }}</td>
+                      <td align="right">{{ g.count }}</td>
+                      <td>{{ 'Home Assistant only' if g.side == 'local' else 'server only' }}</td>
+                      <td>{{ g.examples | join(', ') }}</td>
+                    </tr>
+                  {% endfor %}
+                </table>
+                <p>Confirm or dismiss these from the repair notification.</p>
+              {% else %}
+                <p>Nothing is waiting on a decision.</p>
+              {% endif %}
+            </body></html>
+```
+
+Take the `config_entry` value from **Developer tools → Actions**: pick
+**Media Sync: Get pending deletions**, choose your configuration, then switch
+the editor to YAML and copy what it produced.
+
+#### Attaching a file
+
+`smtp.send_message` takes attachments as **media sources**, not file paths, so
+`/config/media_sync/` has to be exposed as one first:
+
+```yaml
+homeassistant:
+  media_dirs:
+    media: /media
+    media_sync: /config/media_sync
+```
+
+Then add to the same `data:` block:
+
+```yaml
+          attachments:
+            - media_source:
+                media_content_id: media-source://media_source/media_sync/pending.tsv
+                media_content_type: text/plain
+              filename: pending.tsv
+```
+
+`pending.tsv` holds the current run's candidates. `deletions.txt` is the
+other obvious choice and usually the wrong one: it is appended to on every
+run, so it only grows.
 
 ### What automations deliberately cannot do
 
