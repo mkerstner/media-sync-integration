@@ -18,6 +18,10 @@ sync:
       default: false
       selector:
         boolean:
+    full:
+      default: false
+      selector:
+        boolean:
 
 scan_deletions:
   fields:

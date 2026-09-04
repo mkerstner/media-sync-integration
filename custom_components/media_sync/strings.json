@@ -187,6 +187,10 @@
         "dry_run": {
           "description": "Report what would be transferred without writing anything.",
           "name": "Dry run"
+        },
+        "full": {
+          "description": "Compare everything, including folders the server says have not changed. Slower, and the way to catch changes made to the storage behind a WebDAV share without Nextcloud knowing.",
+          "name": "Full comparison"
         }
       },
       "name": "Sync"

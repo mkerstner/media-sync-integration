@@ -94,3 +94,6 @@ CONF_DELETE_ALL: Final = "delete_all"
 
 # Example paths shown per review group. Two fits a form row without wrapping.
 MAX_EXAMPLES: Final = 2
+
+# Compare everything, ignoring the server's word that a folder is unchanged.
+ARG_FULL: Final = "--full"

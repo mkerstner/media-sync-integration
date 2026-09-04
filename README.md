@@ -96,6 +96,28 @@ it produced.
 | --- | --- | --- |
 | `direction` | `both`, `pull`, `push` | `both` keeps whichever copy is newer. `pull` only brings files down, `push` only sends them up. |
 | `dry_run` | `true`, `false` | Report what would happen and change nothing. |
+| `full` | `true`, `false` | Compare everything, including folders the server says have not changed. Needs app 2.1.0. |
+
+A daily full comparison alongside a frequent quick one is the pairing worth
+having. The quick check trusts the server when it says a folder has not
+changed, which is right until something writes to the storage behind a WebDAV
+share without Nextcloud knowing:
+
+```yaml
+automation:
+  - alias: "Full media sync overnight"
+    triggers:
+      - trigger: time
+        at: "03:30:00"
+    actions:
+      - action: media_sync.sync
+        data:
+          config_entry: 01JQ8ZK4M7WXYZ0123456789AB
+          direction: both
+          full: true
+```
+
+Expect it to take as long as a first run, because that is what it is doing.
 
 A weekly rehearsal that changes nothing, so you can see what has drifted:
 

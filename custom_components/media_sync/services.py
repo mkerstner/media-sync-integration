@@ -19,6 +19,7 @@ from homeassistant.helpers.service import async_register_admin_service
 from .const import (
     ARG_ASSUME_YES,
     ARG_DRY_RUN,
+    ARG_FULL,
     ARG_SCAN_ONLY,
     DIRECTION_ARGS,
     DIRECTION_BOTH,
@@ -29,6 +30,7 @@ from .coordinator import MediaSyncConfigEntry
 ATTR_CONFIG_ENTRY = "config_entry"
 ATTR_DIRECTION = "direction"
 ATTR_DRY_RUN = "dry_run"
+ATTR_FULL = "full"
 
 SERVICE_SYNC = "sync"
 SERVICE_SCAN_DELETIONS = "scan_deletions"
@@ -45,6 +47,7 @@ SYNC_SCHEMA = ENTRY_SCHEMA.extend(
     {
         vol.Optional(ATTR_DIRECTION, default=DIRECTION_BOTH): vol.In(DIRECTION_ARGS),
         vol.Optional(ATTR_DRY_RUN, default=False): bool,
+        vol.Optional(ATTR_FULL, default=False): bool,
     }
 )
 
@@ -80,6 +83,8 @@ def async_setup_services(hass: HomeAssistant) -> None:
         args = list(DIRECTION_ARGS[call.data[ATTR_DIRECTION]])
         if call.data[ATTR_DRY_RUN]:
             args.append(ARG_DRY_RUN)
+        if call.data[ATTR_FULL]:
+            args.append(ARG_FULL)
         await entry.runtime_data.async_start_sync(*args, context=call.context)
 
     async def async_scan_deletions(call: ServiceCall) -> None:
